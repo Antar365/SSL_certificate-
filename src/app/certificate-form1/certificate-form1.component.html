@@ -1,0 +1,81 @@
+<div class="container">
+    <div class="certificate-form" *ngIf="!showTable">
+        <h2>Generate SSL Certificate</h2>
+
+        <form [formGroup]="certificateForm" (ngSubmit)="generateCertificate()">
+            <label for="validity">SSL Validity (Days)</label>
+            <select formControlName="validity_days" id="validity" class="form-control">
+                <option value="30">30 Days</option>
+                <option value="90">90 Days</option>
+                <option value="180">180 Days</option>
+                <option value="365">1 Year</option>
+                <option value="730">2 Years</option>
+            </select>
+
+            <label>Common Name:</label>
+            <input type="text" formControlName="common_name" required />
+
+            <label>Subject Alt Name:</label>
+            <input type="text" formControlName="subject_alt_name" required />
+
+            <label>Organization:</label>
+            <input type="text" formControlName="organization" required />
+
+            <label>Organization Unit:</label>
+            <input type="text" formControlName="organization_unit" required />
+
+            <label>Locality:</label>
+            <input type="text" formControlName="locality" required />
+
+            <label>State:</label>
+            <input type="text" formControlName="state" required />
+
+            <label>Country:</label>
+            <input type="text" formControlName="country" required />
+
+            <button type="submit" class="btn btn-primary">Generate Certificate</button>
+        </form>
+
+        <div *ngIf="downloadUrl">
+            <p>Certificate generated successfully!</p>
+            <a [href]="downloadUrl" download class="btn btn-success">Download Certificate</a>
+        </div>
+    </div>
+
+    <!-- Fixed function name from toggleView() to viewCertificates() -->
+    <button (click)="viewCertificates()" class="btn btn-info">
+        {{ showTable ? 'Show Original' : 'View All Certificates' }}
+    </button>
+
+    <div *ngIf="showTable">
+        <div *ngIf="certificates.length > 0; else noCertificates">
+            <table border="1" class="table">
+                <thead>
+                    <tr>
+                        <th>Certificate ID</th>
+                        <th>Common Name</th>
+                        <th>Organization</th>
+                        <th>Expiry Date</th>
+                        <th>Download Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cert of certificates">
+                        <td>{{ cert._id }}</td>
+                        <td>{{ cert.common_name }}</td>
+                        <td>{{ cert.organization }}</td>
+                        <td>{{ cert.expiry_date }}</td>
+                        <td>
+                            <!-- Fixed the download link binding -->
+                            <a [href]="cert.download_link" target="_blank" class="btn btn-link">Download</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <ng-template #noCertificates>
+        <p>No certificates found.</p>
+    </ng-template>
+</div>
