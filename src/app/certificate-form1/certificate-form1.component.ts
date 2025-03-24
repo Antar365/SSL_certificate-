@@ -18,6 +18,7 @@ export class CertificateForm1Component {
   certificates: any[] = [];
   showTable: boolean = false;
   buttonText: string = 'View All Certificates';
+  caInfo: string = 'Loading...'; // Holds CA details
 
   private API_URL = 'http://127.0.0.1:8000';
 
@@ -32,6 +33,9 @@ export class CertificateForm1Component {
       country: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}$/)]],
       validity_days: ['', Validators.required]
     });
+
+    // Fetch CA details when component loads
+    this.getCAInfo();
   }
 
   generateCertificate() {
@@ -104,4 +108,30 @@ export class CertificateForm1Component {
     this.showTable = !this.showTable; 
     this.buttonText = this.showTable ? 'Show Original' : 'View All Certificates'; 
   }
+
+  // New method to fetch CA details
+getCAInfo() {
+  this.http.get<{ ca_name: string }>(`${this.API_URL}/ca-name`)
+    .subscribe(
+      response => {
+        console.log("CA Info:", response);
+        this.caInfo = response.ca_name;
+      },
+      error => {
+        console.error("Failed to fetch CA info:", error);
+        this.caInfo = "Error fetching CA info";
+      }
+    );
+}
+
+// New method to download CA certificate
+downloadCA() {
+  const downloadUrl = `${this.API_URL}/download-ca`;
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.download = "rootCA.crt"; // Suggested filename
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
 }

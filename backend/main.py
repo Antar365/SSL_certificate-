@@ -180,3 +180,25 @@ def get_certificates():
         cert["_id"] = str(cert["_id"])
 
     return {"certificates": certificates}
+# Path to the Root CA certificate
+ROOT_CA_CERT = "generated_certs/rootCA.crt"
+
+def get_ca_name():
+    """Extract only the CA name (issuer) from the certificate"""
+    try:
+        issuer = subprocess.check_output(["openssl", "x509", "-in", ROOT_CA_CERT, "-noout", "-issuer"]).decode().strip()
+        return {"ca_name": issuer.replace("issuer=", "").strip()}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/ca-name")
+def get_ca_info():
+    """API endpoint to get CA name"""
+    return get_ca_name()
+
+@app.get("/download-ca")
+def download_ca():
+    """API endpoint to download the Root CA certificate"""
+    if os.path.exists(ROOT_CA_CERT):
+        return FileResponse(ROOT_CA_CERT, filename="rootCA.crt", media_type="application/x-x509-ca-cert")
+    return {"error": "CA certificate not found"}

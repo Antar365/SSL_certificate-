@@ -42,10 +42,13 @@
         </div>
     </div>
 
-    <!-- Fixed function name from toggleView() to viewCertificates() -->
+    <!-- Button to view all certificates -->
     <button (click)="viewCertificates()" class="btn btn-info">
         {{ showTable ? 'Show Original' : 'View All Certificates' }}
     </button>
+
+    <!-- Button to download CA Certificate -->
+    <button (click)="downloadCA()" class="btn btn-warning">Download CA </button>
 
     <div *ngIf="showTable">
         <div *ngIf="certificates.length > 0; else noCertificates">
@@ -66,7 +69,6 @@
                         <td>{{ cert.organization }}</td>
                         <td>{{ cert.expiry_date }}</td>
                         <td>
-                            <!-- Fixed the download link binding -->
                             <a [href]="cert.download_link" target="_blank" class="btn btn-link">Download</a>
                         </td>
                     </tr>
